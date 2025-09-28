@@ -1,7 +1,6 @@
 import style from "./GridItem.module.css";
 
 interface GridItemProps {
-  onClick?: () => void;
   children: React.ReactNode;
 }
 

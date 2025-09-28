@@ -7,6 +7,7 @@ import Form from "../Form/Form";
 import PhotosGallery from "../PhotosGallery/PhotosGallery";
 import Loader from "../Loader/Loader";
 import Modal from "../Modal/Modal";
+import Text from "../Text/Text";
 import { getPhotos } from "../../services/photos";
 
 export default function App() {
@@ -14,14 +15,15 @@ export default function App() {
   const [isEmpty, setIsEmpty] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState(false);
   const [selectedPhoto, setSelectedPhoto] = useState<Photo | null>(null);
+  const [isOpen, setIsOpen] = useState<boolean>(false);
 
-  const handlePhotoClick = (photo: Photo) => {
+  const openModal = (photo: Photo) => {
+    setIsOpen(true);
     setSelectedPhoto(photo);
-    console.log(setSelectedPhoto);
   };
 
   const onSubmit = async (query: string) => {
-    setIsEmpty(true);
+    setIsEmpty(false);
     setIsLoading(true);
     setPhotos([]);
 
@@ -32,6 +34,7 @@ export default function App() {
         setIsEmpty(true);
         return;
       }
+      setIsEmpty(false);
       setPhotos(data);
     } catch (error) {
       toast.error("Failed to fetch photos.");
@@ -43,24 +46,34 @@ export default function App() {
 
   const closeModal = () => {
     setSelectedPhoto(null);
+    setIsOpen(false);
   };
 
   return (
     <>
       <Section>
         <Container>
+          {isOpen && selectedPhoto && (
+            <Modal onClose={closeModal}>
+              <div
+                style={{
+                  backgroundColor: selectedPhoto.avg_color,
+                  borderColor: selectedPhoto.avg_color,
+                }}
+              >
+                <img src={selectedPhoto.src.large} alt={selectedPhoto.alt} />
+              </div>
+            </Modal>
+          )}
           <Form onSubmit={onSubmit} />
+          {photos.length > 0 && (
+            <PhotosGallery photos={photos} onPhotoClick={openModal} />
+          )}
           {isLoading && <Loader />}
           {isEmpty && (
-            <p>No photos found. Please try a different search term.</p>
-          )}
-          {photos.length > 0 && (
-            <PhotosGallery photos={photos} onPhotoClick={handlePhotoClick} />
-          )}
-          {selectedPhoto && (
-            <Modal onClose={closeModal}>
-              <img src={selectedPhoto.src.large} alt={selectedPhoto.alt} />
-            </Modal>
+            <Text textAlign="center" variant="error">
+              No photos found. Please try a different search term.
+            </Text>
           )}
         </Container>
         Home page

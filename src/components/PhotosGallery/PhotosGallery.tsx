@@ -14,8 +14,12 @@ export default function PhotosGallery({
   return (
     <Grid>
       {photos.map((photo) => (
-        <GridItem key={photo.id} onClick={() => onPhotoClick(photo)}>
-          <PhotosGalleryItem photo={photo} />
+        <GridItem>
+          <PhotosGalleryItem
+            photo={photo}
+            key={photo.id}
+            onPhotoClick={onPhotoClick}
+          />
         </GridItem>
       ))}
     </Grid>
