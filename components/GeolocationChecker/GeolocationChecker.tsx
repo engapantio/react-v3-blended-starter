@@ -1,10 +1,12 @@
 'use client';
 
 import { useEffect } from 'react';
-
+import { useCurrencyStore } from '@/lib/stores/currencyStore';
 import { getUserInfo } from '@/lib/service/opencagedataApi';
 
 export default function GeolocationChecker() {
+  const { hasHydrated, baseCurrency } = useCurrencyStore();
+  const setBaseCurrency = useCurrencyStore((state) => state.setBaseCurrency);
   useEffect(() => {
     const options = {
       enableHighAccuracy: true,
@@ -17,10 +19,12 @@ export default function GeolocationChecker() {
       return data.results[0].annotations.currency.iso_code;
     };
 
-    const error = () => {};
+    const error = () => {
+      setBaseCurrency('USD');
+    };
 
     navigator.geolocation.getCurrentPosition(success, error, options);
-  }, []);
+  }, [setBaseCurrency]);
 
-  return null;
+  if (!hasHydrated || baseCurrency) return;
 }

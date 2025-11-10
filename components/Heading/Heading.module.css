@@ -18,11 +18,11 @@
 }
 
 .error {
-  composes: title;
+
   color: var(--color-error);
 }
 
 .info {
-  composes: title;
+ 
   color: #adcb28;
 }
