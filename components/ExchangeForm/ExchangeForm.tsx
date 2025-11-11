@@ -1,7 +1,7 @@
 'use client';
 
 import { RiExchangeDollarFill } from 'react-icons/ri';
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useCurrencyStore } from '@/lib/stores/currencyStore';
 import { exchangeCurrency } from '@/lib/service/exchangeAPI';
@@ -10,26 +10,49 @@ import styles from './ExchangeForm.module.css';
 
 export default function ExchangeForm() {
   const [rest, setRest] = useState<Credentials>({ to: '', from: '', amount: 0 });
-  const state = useCurrencyStore();
+  // ✅ Get store functions
+  const storeSetExchangeInfo = useCurrencyStore((state) => state.setExchangeInfo);
+  const storeSetIsLoading = useCurrencyStore((state) => state.setIsLoading);
+  const storeSetIsError = useCurrencyStore((state) => state.setIsError);
+
+  // ✅ Memoize with useCallback to get stable references
+  const setExchangeInfo = useCallback(storeSetExchangeInfo, []);
+  const setIsLoading = useCallback(storeSetIsLoading, []);
+  const setIsError = useCallback(storeSetIsError, []);
+
   const { data, isLoading, isError, isSuccess } = useQuery({
-    queryKey: ['query', rest],
+    queryKey: ['exchange', rest.from, rest.to, rest.amount],
     queryFn: () => exchangeCurrency(rest),
     refetchOnMount: false,
-    staleTime: 10000, // 10 seconds
+    staleTime: 10000,
     refetchOnWindowFocus: false,
     enabled: rest.from !== '',
   });
-  if (isSuccess) {
-    state.setExchangeInfo(data);
-    state.setIsLoading(isLoading);
-    state.setIsError(isError);
-  }
 
-  if (isError) {
-    state.setExchangeInfo(null);
-    state.setIsLoading(isLoading);
-    state.setIsError(isError);
-  }
+  // ✅ Update store when query succeeds
+  useEffect(() => {
+    if (isSuccess && data) {
+      setExchangeInfo(data);
+      setIsLoading(false);
+      setIsError(false);
+    }
+  }, [isSuccess, data, setExchangeInfo, setIsLoading, setIsError]);
+
+  // ✅ Handle errors
+  useEffect(() => {
+    if (isError) {
+      setExchangeInfo(null);
+      setIsLoading(false);
+      setIsError(true);
+    }
+  }, [isError, setExchangeInfo, setIsLoading, setIsError]);
+
+  // ✅ Sync loading state
+  useEffect(() => {
+    if (!isSuccess && !isError) {
+      setIsLoading(isLoading);
+    }
+  }, [isLoading, isSuccess, isError, setIsLoading]);
 
   const handleSubmit = (formData: FormData) => {
     const currency = formData.get('currency') as string;

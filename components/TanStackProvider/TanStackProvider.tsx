@@ -1,5 +1,3 @@
-// components/TanStackProvider/TanStackProvider.tsx
-
 'use client';
 
 import { useState } from 'react';
@@ -11,7 +9,20 @@ type Props = {
 };
 
 const TanStackProvider = ({ children }: Props) => {
-  const [queryClient] = useState(() => new QueryClient());
+  const [queryClient] = useState(
+    () =>
+      new QueryClient({
+        defaultOptions: {
+          queries: {
+            staleTime: 10 * 1000, // ✅ 10 seconds
+            gcTime: 5 * 60 * 1000, // ✅ 5 minutes (formerly cacheTime)
+            retry: 1, // ✅ Limit retries
+            refetchOnWindowFocus: false, // ✅ Don't refetch on window focus
+            refetchOnMount: false, // ✅ Don't refetch on mount
+          },
+        },
+      })
+  );
 
   return (
     <QueryClientProvider client={queryClient}>
