@@ -8,8 +8,8 @@ export interface Credentials {
 const apiKey = process.env.NEXT_PUBLIC_API_LAYER_API_KEY;
 
 const instance = axios.create({
-  baseURL: 'https://api.apilayer.com/exchangerates_data/',
-  headers: { apikey: apiKey ?? '' },
+  baseURL: 'https://api.apilayer.com/exchangerates_data',
+  headers: { apikey: apiKey },
 });
 
 export const exchangeCurrency = async (credentials: Credentials) => {

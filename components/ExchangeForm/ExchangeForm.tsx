@@ -14,11 +14,19 @@ export default function ExchangeForm() {
   const { data, isLoading, isError, isSuccess } = useQuery({
     queryKey: ['query', rest],
     queryFn: () => exchangeCurrency(rest),
+    refetchOnMount: false,
+    staleTime: 10000, // 10 seconds
+    refetchOnWindowFocus: false,
     enabled: rest.from !== '',
   });
   if (isSuccess) {
-    state.setBaseCurrency(data.from);
-    state.setExchangeInfo(data.result);
+    state.setExchangeInfo(data);
+    state.setIsLoading(isLoading);
+    state.setIsError(isError);
+  }
+
+  if (isError) {
+    state.setExchangeInfo(null);
     state.setIsLoading(isLoading);
     state.setIsError(isError);
   }
@@ -26,7 +34,7 @@ export default function ExchangeForm() {
   const handleSubmit = (formData: FormData) => {
     const currency = formData.get('currency') as string;
     const res = currency.split(' ');
-    console.log(res);
+
     setRest(() => {
       return {
         to: res[3],

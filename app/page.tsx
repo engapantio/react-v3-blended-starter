@@ -5,6 +5,7 @@ import Container from '@/components/Container/Container';
 import Heading from '@/components/Heading/Heading';
 import ExchangeForm from '@/components/ExchangeForm/ExchangeForm';
 import ExchangeInfo from '@/components/ExchangeInfo/ExchangeInfo';
+import Loader from '@/components/Loader/Loader';
 import { useCurrencyStore } from '@/lib/stores/currencyStore';
 
 import css from './page.module.css';
@@ -23,6 +24,7 @@ export default function Home() {
             top={true}
             bottom={false}
           />
+          {state.isLoading && <Loader />}
           <ExchangeForm />
           {state.exchangeInfo && (
             <ExchangeInfo

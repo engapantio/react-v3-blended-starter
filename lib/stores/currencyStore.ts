@@ -15,12 +15,14 @@ export type CurrencyState = {
   isLoading: boolean;
   isError: boolean | null;
   exchangeInfo: ExchangeInfo | null;
+  rates: [];
   hasHydrated: boolean;
   setHasHydrated: (st: boolean) => void;
   setBaseCurrency: (currency: string) => void;
-  setExchangeInfo: (info: ExchangeInfo) => void;
+  setExchangeInfo: (info: ExchangeInfo | null) => void;
   setIsLoading: (st: boolean) => void;
   setIsError: (er: boolean) => void;
+  setRates: (rt: []) => void;
 };
 
 export const useCurrencyStore = create<CurrencyState>()(
@@ -30,12 +32,14 @@ export const useCurrencyStore = create<CurrencyState>()(
       exchangeInfo: null,
       isLoading: false,
       isError: null,
+      rates: [],
       hasHydrated: false,
       setHasHydrated: (st) => set({ hasHydrated: st }),
-      setBaseCurrency: (currency) => set(() => ({ baseCurrency: currency })),
-      setExchangeInfo: (info) => set(() => ({ exchangeInfo: info })),
+      setBaseCurrency: (currency) => set({ baseCurrency: currency }),
+      setExchangeInfo: (info) => set({ exchangeInfo: info }),
       setIsLoading: (st) => set({ isLoading: st }),
       setIsError: (er) => set({ isError: er }),
+      setRates: (rt) => set({ rates: rt }),
     }),
     {
       // Ключ у localStorage
