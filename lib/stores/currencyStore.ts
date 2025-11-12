@@ -9,20 +9,24 @@ type ExchangeInfo = {
   rate: number;
   result: number;
 };
+export type Rate = {
+  key: string;
+  value: string;
+}
 
 export type CurrencyState = {
   baseCurrency: string;
   isLoading: boolean;
   isError: boolean | null;
   exchangeInfo: ExchangeInfo | null;
-  rates: [];
+  rates: Rate[];
   hasHydrated: boolean;
   setHasHydrated: (st: boolean) => void;
   setBaseCurrency: (currency: string) => void;
   setExchangeInfo: (info: ExchangeInfo | null) => void;
   setIsLoading: (st: boolean) => void;
   setIsError: (er: boolean) => void;
-  setRates: (rt: []) => void;
+  setRates: (rt: Rate[]) => void;
 };
 
 export const useCurrencyStore = create<CurrencyState>()(

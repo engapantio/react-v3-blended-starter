@@ -5,6 +5,7 @@ export interface Credentials {
   from: string;
   to: string;
 }
+
 const apiKey = process.env.NEXT_PUBLIC_API_LAYER_API_KEY;
 
 const instance = axios.create({
