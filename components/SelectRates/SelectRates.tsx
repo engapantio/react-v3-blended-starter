@@ -1,19 +1,15 @@
-import Select, { SingleValue } from 'react-select';
+'use client';
+
+import Select from 'react-select';
 
 import symbols from './symbols.json';
 
 import './ReactSelect.css';
 import styles from './SelectRates.module.css';
 import { useCurrencyStore } from '@/lib/stores/currencyStore';
-type Props = {
-  baseCurrency: string;
-};
-export default function SelectRates({ baseCurrency }: Props) {
-  const setBaseCurrency = useCurrencyStore((state) => state.setBaseCurrency);
 
-  const handleChange = (selectedOption: SingleValue<OptionType>) => {
-    setBaseCurrency(selectedOption);
-  };
+export default function SelectRates() {
+  const { baseCurrency, setBaseCurrency } = useCurrencyStore();
 
   return (
     <div className={styles.box}>
@@ -22,11 +18,13 @@ export default function SelectRates({ baseCurrency }: Props) {
         className={styles.select}
         classNamePrefix="react-select"
         value={{
-          label: baseCurrency,
           value: baseCurrency,
+          label: baseCurrency,
         }}
         options={symbols}
-        onChange={handleChange}
+        onChange={(option) => {
+          if (option) setBaseCurrency(option.value);
+        }}
         isSearchable
       />
     </div>

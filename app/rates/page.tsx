@@ -1,44 +1,61 @@
 'use client';
 
 import { Wave } from 'react-animated-text';
-import { useQuery, keepPreviousData } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
+import { useEffect } from 'react';
 import Container from '@/components/Container/Container';
 import Section from '@/components/Section/Section';
 import Heading from '@/components/Heading/Heading';
 import RatesList from '@/components/RatesList/RatesList';
+import Filter from '@/components/Filter/Filter';
 import { useCurrencyStore } from '@/lib/stores/currencyStore';
-import { latestRates } from '@/lib/service/exchangeAPI';
+import { getLatestRates } from '@/lib/service/exchangeAPI';
 import css from './RatesPage.module.css';
-import { useEffect } from 'react';
-import { Rate } from '@/lib/stores/currencyStore';
 
 export default function RatesPage() {
-  const setRates = useCurrencyStore((state) => state.setRates);
-  const isError = useCurrencyStore((state) => state.isError);
-  const baseCurrency = useCurrencyStore((state) => state.baseCurrency);
+  const { baseCurrency, filter, setRates, setIsLoading, setIsError } = useCurrencyStore();
 
-  const { data } = useQuery({
+  const { data, isLoading, error } = useQuery({
     queryKey: ['rates', baseCurrency],
-    queryFn: () => latestRates(baseCurrency),
-    placeholderData: keepPreviousData,
+    queryFn: () => getLatestRates(baseCurrency),
   });
 
-  const filteredRates: Rate[] = data
-    ? data
-        .filter(([key]) => key !== baseCurrency)
-        .map(([key, value]) => ({ key, value: (1 / value).toFixed(2) }))
-    : [];
-
   useEffect(() => {
-    setRates(filteredRates);
-  }, [filteredRates, baseCurrency]);
+    if (!baseCurrency) return;
+
+    const fetchRates = async () => {
+      setIsLoading(true);
+      try {
+        const data = await getLatestRates(baseCurrency);
+        setRates(data);
+      } catch (error) {
+        console.log(error);
+        setIsError('Error to load rates');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchRates();
+  }, [baseCurrency, setIsError, setIsLoading, setRates]);
+
+  if (isLoading) return <div>Loading...</div>;
+  if (error) return <div>Error loading data</div>;
+  if (!data) return null;
+
+  const filteredRates = data
+    .filter(([key]) => key !== baseCurrency && key.toLowerCase().includes(filter.toLowerCase()))
+    .map(([key, value]) => ({ key, value: (1 / value).toFixed(2) }));
+
   return (
     <main className={css.main}>
       <Section>
         <Container>
           <Heading
             info={true}
+            error={false}
             bottom={false}
+            top={true}
             title={
               <Wave
                 text={`$ $ $ Current exchange rate for 1 ${baseCurrency} $ $ $`}
@@ -47,9 +64,10 @@ export default function RatesPage() {
               />
             }
           />
+          <Filter />
           {filteredRates.length > 0 && <RatesList rates={filteredRates} />}
 
-          {isError && (
+          {error && (
             <Heading
               top={false}
               bottom={true}

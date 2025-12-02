@@ -6,25 +6,30 @@ export interface Credentials {
   to: string;
 }
 
+interface ConvertResponse extends Credentials {
+  rate: number;
+  result: number;
+}
+
 const apiKey = process.env.NEXT_PUBLIC_API_LAYER_API_KEY;
+const baseURL = 'https://api.apilayer.com/exchangerates_data';
 
-const instance = axios.create({
-  baseURL: 'https://api.apilayer.com/exchangerates_data',
-  headers: { apikey: apiKey },
-});
-
-export const exchangeCurrency = async (credentials: Credentials) => {
+export const convertCurrency = async (credentials: Credentials): Promise<ConvertResponse> => {
   const {
     data: { query, info, result },
-  } = await instance.get('/convert', {
+  } = await axios.get(`${baseURL}/convert`, {
     params: credentials,
+    headers: { apikey: apiKey! },
   });
 
   return { ...query, rate: info.rate, result };
 };
 
-export const latestRates = async (baseCurrency: string) => {
-  const { data } = await instance.get(`/latest?symbols&base=${baseCurrency}`);
+export const getLatestRates = async (baseCurrency: string): Promise<[string, number][]> => {
+  const { data } = await axios.get(`${baseURL}/latest`, {
+    params: { base: baseCurrency },
+    headers: { apikey: apiKey! },
+  });
 
   return Object.entries(data.rates);
 };

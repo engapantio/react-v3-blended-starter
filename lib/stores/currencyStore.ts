@@ -8,25 +8,24 @@ type ExchangeInfo = {
   amount: number;
   rate: number;
   result: number;
-};
-export type Rate = {
-  key: string;
-  value: string;
-}
+} | null;
 
-export type CurrencyState = {
+
+type CurrencyState = {
   baseCurrency: string;
   isLoading: boolean;
-  isError: boolean | null;
-  exchangeInfo: ExchangeInfo | null;
-  rates: Rate[];
+  isError: string | null;
+  exchangeInfo: ExchangeInfo;
+  rates: [string, number][];
+  filter: string;
   hasHydrated: boolean;
-  setHasHydrated: (st: boolean) => void;
+  setHasHydrated: (hd: boolean) => void;
   setBaseCurrency: (currency: string) => void;
-  setExchangeInfo: (info: ExchangeInfo | null) => void;
-  setIsLoading: (st: boolean) => void;
-  setIsError: (er: boolean) => void;
-  setRates: (rt: Rate[]) => void;
+  setExchangeInfo: (info: ExchangeInfo) => void;
+  setIsLoading: (ld: boolean) => void;
+  setIsError: (er: string | null) => void;
+  setFilter: (filter: string) => void;
+  setRates: (rates:[string, number][]) => void;
 };
 
 export const useCurrencyStore = create<CurrencyState>()(
@@ -37,17 +36,19 @@ export const useCurrencyStore = create<CurrencyState>()(
       isLoading: false,
       isError: null,
       rates: [],
+      filter: '',
       hasHydrated: false,
-      setHasHydrated: (st) => set({ hasHydrated: st }),
+      setHasHydrated: (hd) => set({ hasHydrated: hd }),
       setBaseCurrency: (currency) => set({ baseCurrency: currency }),
       setExchangeInfo: (info) => set({ exchangeInfo: info }),
-      setIsLoading: (st) => set({ isLoading: st }),
+      setIsLoading: (ld) => set({ isLoading: ld }),
       setIsError: (er) => set({ isError: er }),
-      setRates: (rt) => set({ rates: rt }),
+      setRates: (rates) => set({ rates }),
+      setFilter: (filter) => set({ filter })
     }),
     {
       // Ключ у localStorage
-      name: 'base-currency',
+      name: 'currency-storage',
       partialize: (state) => ({ baseCurrency: state.baseCurrency }),
       onRehydrateStorage: () => (state) => {
         state?.setHasHydrated(true);

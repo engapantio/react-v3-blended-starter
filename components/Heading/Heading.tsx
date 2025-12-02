@@ -1,7 +1,8 @@
+import { ReactNode } from 'react';
 import styles from './Heading.module.css';
 
 interface HeadingProps {
-  title: string;
+  title: string | ReactNode;
   top: boolean;
   bottom: boolean;
   error: boolean;
