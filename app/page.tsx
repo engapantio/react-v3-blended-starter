@@ -6,6 +6,7 @@ import Heading from '@/components/Heading/Heading';
 import ExchangeForm from '@/components/ExchangeForm/ExchangeForm';
 import ExchangeInfo from '@/components/ExchangeInfo/ExchangeInfo';
 import Loader from '@/components/Loader/Loader';
+import GeolocationChecker from '@/components/GeolocationChecker/GeolocationChecker';
 import { useCurrencyStore } from '@/lib/stores/currencyStore';
 
 import css from './page.module.css';
@@ -17,6 +18,7 @@ export default function Home() {
     <main className={css.main}>
       <Section>
         <Container>
+          <GeolocationChecker/>
           <Heading
             info={true}
             error={false}

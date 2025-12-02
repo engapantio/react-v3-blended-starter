@@ -28,14 +28,16 @@ export default function Header() {
                 Rates
               </Link>
             </li>
+            <li>
+              {baseCurrency && (
+                <div className={styles.currency}>
+                  <p>Your base currency: {baseCurrency}</p>
+                  <SelectRates />
+                </div>
+              )}
+            </li>
           </ul>
         </nav>
-        {baseCurrency && (
-          <div>
-            <p>Your base currency: {baseCurrency}</p>
-            <SelectRates />
-          </div>
-        )}
       </div>
     </header>
   );

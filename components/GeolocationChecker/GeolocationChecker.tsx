@@ -10,12 +10,6 @@ export default function GeolocationChecker() {
   useEffect(() => {
     if (!hasHydrated || baseCurrency) return;
 
-    // const options = {
-    //   enableHighAccuracy: true,
-    //   timeout: 5000,
-    //   maximumAge: 0,
-    // };
-
     const success = async (position: GeolocationPosition) => {
       const { latitude, longitude } = position.coords;
       try {
